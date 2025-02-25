@@ -1,0 +1,19 @@
+{% extends 'spa/base.html' %}
+
+{% block title %}Verificador de Palíndromos{% endblock %}
+
+{% block content %}
+    <h2>Verificador de Palíndromos</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="texto" class="form-label">Ingrese una palabra o frase</label>
+            <input type="text" class="form-control" id="texto" name="texto" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Verificar</button>
+    </form>
+
+    {% if resultado %}
+        <h3>{{ resultado }}</h3>
+    {% endif %}
+{% endblock %}

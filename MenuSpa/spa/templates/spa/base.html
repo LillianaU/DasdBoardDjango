@@ -1,0 +1,477 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Mi Proyecto Django{% endblock %}</title>
+    {% load static %}
+
+
+    <link rel="stylesheet" href="{% static 'spa/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'spa/css/styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --header-height: 60px;
+            --sidebar-width: 280px;
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+            --text-light: #ecf0f1;
+            --border-color: rgba(236, 240, 241, 0.1);
+            --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --shadow-medium: 0 5px 15px rgba(0, 0, 0, 0.15);
+            --transition-speed: 0.3s;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            overflow-x: hidden;
+            padding-top: var(--header-height);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* Header estilizado */
+        .main-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            z-index: 1010;
+            box-shadow: var(--shadow-light);
+            transition: all var(--transition-speed);
+        }
+        
+        .main-header h3 {
+            margin-left: 50px;
+            margin-bottom: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all var(--transition-speed);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* Backdrop para móviles */
+        .sidebar-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1005;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-speed);
+        }
+        
+        .sidebar-backdrop.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Sidebar mejorado */
+        .sidebar {
+            height: calc(100vh - var(--header-height));
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            background-color: var(--secondary-color);
+            color: var(--text-light);
+            transition: all var(--transition-speed);
+            z-index: 1006;
+            overflow-y: auto;
+            box-shadow: var(--shadow-medium);
+            width: 0;
+            transform: translateX(-100%);
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-color) var(--secondary-color);
+        }
+        
+        .sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+        
+        .sidebar::-webkit-scrollbar-track {
+            background: var(--secondary-color);
+        }
+        
+        .sidebar::-webkit-scrollbar-thumb {
+            background-color: var(--accent-color);
+        }
+        
+        .sidebar-expanded {
+            width: var(--sidebar-width);
+            transform: translateX(0);
+        }
+        
+        /* Header del sidebar */
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .sidebar-header h4 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+        
+        .sidebar-close {
+            background: transparent;
+            color: var(--text-light);
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+        }
+        
+        /* Organización por región del menú */
+        .menu-region {
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .menu-region:last-child {
+            border-bottom: none;
+        }
+        
+        .menu-region-title {
+            color: rgba(236, 240, 241, 0.6);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            padding: 1rem 1.5rem 0.5rem;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        
+        .sidebar .nav-link {
+            color: var(--text-light);
+            transition: all 0.2s;
+            padding: 0.85rem 1.5rem;
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+            position: relative;
+        }
+        
+        .sidebar .nav-link i {
+            width: 20px;
+            margin-right: 12px;
+            text-align: center;
+            font-size: 1rem;
+        }
+        
+        .sidebar .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar .nav-link.active {
+            background-color: var(--accent-color);
+            font-weight: 500;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background-color: #fff;
+        }
+        
+        /* Botón de menú */
+        .menu-toggle {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1020;
+            background: transparent;
+            border: none;
+            color: var(--text-light);
+            width: 50px;
+            height: var(--header-height);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            outline: none;
+        }
+        
+        .menu-toggle i {
+            font-size: 1.25rem;
+            transition: transform 0.3s;
+        }
+        
+        .menu-open .menu-toggle i {
+            transform: rotate(90deg);
+        }
+        
+        /* Contenido principal */
+        .content-wrapper {
+            transition: padding-left var(--transition-speed);
+            padding: 1.5rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        /* Ajustes para dispositivos */
+        @media (min-width: 992px) {
+            .menu-toggle {
+                left: 0.5rem;
+            }
+            
+            .content-shifted {
+                padding-left: calc(var(--sidebar-width) + 1.5rem);
+            }
+            
+            .main-header.menu-open {
+                left: var(--sidebar-width);
+            }
+        }
+        
+        @media (max-width: 991.98px) {
+            .main-header h3 {
+                font-size: 1.1rem;
+                margin-left: 45px;
+            }
+            
+            .sidebar {
+                box-shadow: var(--shadow-medium);
+            }
+            
+            .menu-toggle {
+                width: 45px;
+            }
+        }
+        
+        @media (max-width: 767.98px) {
+            .sidebar {
+                width: 85%;
+                max-width: 300px;
+            }
+            
+            .content-wrapper {
+                padding: 1rem;
+            }
+            
+            .main-header h3 {
+                font-size: 1rem;
+            }
+        }
+        
+        /* Animaciones para componentes */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Status badge para enlaces activos o nuevos */
+        .nav-status {
+            margin-left: auto;
+            font-size: 0.7rem;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+        }</style>
+
+    
+</head>
+<body>
+    <!-- Header fijo -->
+    <header id="mainHeader" class="main-header">
+        <button id="menuToggle" class="menu-toggle" aria-label="Toggle Menu">
+            <i class="fas fa-bars"></i>
+        </button>
+        <h3>{% block header_title %}Mi Proyecto Django{% endblock %}</h3>
+    </header>
+    
+    <!-- Backdrop para móviles -->
+    <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
+    
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h4>Panel de Control</h4>
+            <button id="sidebarClose" class="sidebar-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <!-- Operaciones Matemáticas -->
+        <div class="menu-region">
+            <div class="menu-region-title">Operaciones Matemáticas</div>
+            <nav class="nav flex-column">
+                <a class="nav-link" href="{% url 'suma' %}">
+                    <i class="fas fa-plus-circle"></i> 
+                    <span>Suma</span>
+                </a>
+                <a class="nav-link" href="{% url 'resta' %}">
+                    <i class="fas fa-minus-circle"></i>
+                    <span>Resta</span>
+                </a>
+            </nav>
+        </div>
+        
+        <!-- Operaciones de Texto -->
+        <div class="menu-region">
+            <div class="menu-region-title">Operaciones de Texto</div>
+            <nav class="nav flex-column">
+                <a class="nav-link" href="{% url 'palindromos' %}">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>Palíndromos</span>
+                    <span class="nav-status">Nuevo</span>
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Contenido principal -->
+    <main id="content" class="content-wrapper">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Referencias DOM
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebarClose = document.getElementById('sidebarClose');
+            const sidebar = document.getElementById('sidebar');
+            const content = document.getElementById('content');
+            const mainHeader = document.getElementById('mainHeader');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            const menuLinks = document.querySelectorAll('.sidebar .nav-link');
+            const isMobile = () => window.innerWidth < 992;
+            
+            // Función para abrir el menú
+            function openMenu() {
+                sidebar.classList.add('sidebar-expanded');
+                backdrop.classList.add('visible');
+                
+                if (!isMobile()) {
+                    content.classList.add('content-shifted');
+                    mainHeader.classList.add('menu-open');
+                }
+                
+                document.body.style.overflow = isMobile() ? 'hidden' : '';
+                menuToggle.setAttribute('aria-expanded', 'true');
+                document.documentElement.classList.add('menu-open');
+            }
+            
+            // Función para cerrar el menú
+            function closeMenu() {
+                sidebar.classList.remove('sidebar-expanded');
+                backdrop.classList.remove('visible');
+                content.classList.remove('content-shifted');
+                mainHeader.classList.remove('menu-open');
+                document.body.style.overflow = '';
+                menuToggle.setAttribute('aria-expanded', 'false');
+                document.documentElement.classList.remove('menu-open');
+            }
+            
+            // Establecer el ítem activo basado en la URL actual
+            function setActiveMenuItem() {
+                const currentPath = window.location.pathname;
+                menuLinks.forEach(link => {
+                    if (link.getAttribute('href') === currentPath) {
+                        link.classList.add('active', 'fade-in');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+            }
+            
+            // Evento para abrir/cerrar el menú
+            menuToggle.addEventListener('click', function() {
+                if (!sidebar.classList.contains('sidebar-expanded')) {
+                    openMenu();
+                } else {
+                    closeMenu();
+                }
+            });
+            
+            // Cerrar con botón X
+            sidebarClose.addEventListener('click', closeMenu);
+            
+            // Cerrar con backdrop
+            backdrop.addEventListener('click', closeMenu);
+            
+            // Cerrar el menú cuando se hace clic en un enlace en móviles
+            menuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (isMobile()) {
+                        closeMenu();
+                    }
+                    
+                    // Eliminar clase activa de todos los enlaces
+                    menuLinks.forEach(l => l.classList.remove('active'));
+                    // Añadir clase activa al enlace actual
+                    this.classList.add('active', 'fade-in');
+                });
+            });
+            
+            // Establecer el ítem activo en la carga inicial
+            setActiveMenuItem();
+            
+            // Manejar cambios de tamaño de ventana
+            window.addEventListener('resize', function() {
+                if (sidebar.classList.contains('sidebar-expanded')) {
+                    if (!isMobile()) {
+                        content.classList.add('content-shifted');
+                        mainHeader.classList.add('menu-open');
+                        document.body.style.overflow = '';
+                    } else {
+                        content.classList.remove('content-shifted');
+                        mainHeader.classList.remove('menu-open');
+                        document.body.style.overflow = 'hidden';
+                    }
+                }
+            });
+            
+            // Prevenir que el menú se cierre al hacer clic dentro de él
+            sidebar.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+            
+            // Soporte para teclado (accesibilidad)
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && sidebar.classList.contains('sidebar-expanded')) {
+                    closeMenu();
+                }
+            });
+        });
+    </script>
+
+    <script src="{% static 'spa/js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>
