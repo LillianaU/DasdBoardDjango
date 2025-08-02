@@ -128,8 +128,10 @@ ESTRUCTURA FINAL DEL PROYECTO
 
 Después de completar los pasos, tu estructura debe parecerse a esto:
 
+
+
+```
 MenuSpa/
-│
 ├── db.sqlite3
 ├── manage.py
 │
@@ -157,6 +159,7 @@ MenuSpa/
             ├── palindromos.html
             ├── resta.html
             └── suma.html
+```
 
 
 -------------------------------------------------------------------------------
