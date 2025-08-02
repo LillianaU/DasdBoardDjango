@@ -179,6 +179,6 @@ PARA INICIAR LA APLICACIÓN:
 
     python manage.py runserver
 
-Abre tu navegador y visita: http://127.0.0.1:8000/spa/
+Abre tu navegador y visita: http://127.0.0.1:8000/
 
 ¡Listo! El proyecto está configurado y funcionando.
